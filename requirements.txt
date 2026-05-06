@@ -1,0 +1,19 @@
+numpy==1.26.4 # Fundamental package for array computing and numerical operations.
+pandas==2.2.1 # Library for data manipulation and analysis with DataFrames.
+scipy==1.13.0 # Scientific computing library for optimization, integration, and statistics.
+scikit-learn==1.4.2 # Machine learning library for classification, regression, and clustering.
+torch==2.3.0 # Deep learning framework for building and training neural networks.
+torchdiffeq==0.2.3 # Library for solving ordinary differential equations using neural networks.
+matplotlib==3.8.4 # Plotting library for creating static, animated, and interactive visualizations.
+seaborn==0.13.2 # Statistical data visualization library based on matplotlib.
+mlflow==2.12.1 # Platform for managing the machine learning lifecycle, including experimentation and deployment.
+fastapi==0.111.0 # Modern web framework for building APIs with Python.
+uvicorn==0.29.0 # ASGI web server for running FastAPI applications.
+pydantic==2.7.1 # Data validation and settings management using Python type annotations.
+onnxruntime==1.18.0 # Runtime for executing ONNX models for inference.
+python-dotenv==1.0.1 # Library for reading environment variables from a .env file.
+joblib==1.4.0 # Library for running Python functions as pipeline jobs with parallel execution.
+tqdm==4.66.4 # Library for displaying progress bars in loops and tasks.
+pytest==8.1.1 # Framework for writing and running tests in Python.
+pytest-cov==4.1.0 # Plugin for pytest to measure code coverage.
+black==24.4.2 # Code formatter for Python that enforces consistent style.

@@ -1,0 +1,30 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+battery_soc_env/
+.battery_soc_env/
+
+# Environment variables and secrets
+.env
+
+# Large dataset files
+data/raw/
+data/processed/
+
+# Saved model artifacts
+models_saved/*.pt
+models_saved/*.onnx
+models_saved/*.pkl
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
