@@ -47,5 +47,6 @@ if ($RunTests) {
 }
 
 Write-Host "Helper script finished."
-Write-Host "If you want to train models, run: python train.py --model cnn" \
-           "and after training, run: python .\scripts\evaluate_cnn_ukf.py"
+Write-Host "If you want to train the primary model, run: python train.py --model neural_ode"
+Write-Host "To benchmark saved checkpoints, run: python .\scripts\benchmark_models.py"
+Write-Host "For the CNN+UKF comparison, run: python .\scripts\evaluate_cnn_ukf.py"

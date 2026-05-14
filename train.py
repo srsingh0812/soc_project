@@ -11,6 +11,7 @@ Run from the repository root:
 from __future__ import annotations
 
 import argparse
+import os
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -127,11 +128,13 @@ def main(model_type: str, debug: bool = False) -> None:
     print(f"Model: {model_type}")
     print(f"Trainable parameters: {trainable_params}")
 
+    os.makedirs(Paths.MODELS_SAVED, exist_ok=True)
     trainer = Trainer(model)
     trainer.train(train_loader, val_loader, run_name=model_type, debug=debug)
 
     # Load the best saved model weights after training finishes.
-    state_dict = torch.load(Paths.BEST_MODEL_PT, map_location=trainer.device)
+    checkpoint_path = Paths.best_model_pt(model_type)
+    state_dict = torch.load(checkpoint_path, map_location=trainer.device)
     model.load_state_dict(state_dict)
     model.to(trainer.device)
     model.eval()

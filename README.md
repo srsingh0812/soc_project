@@ -6,12 +6,10 @@ This repository estimates battery state-of-charge (SOC) from Panasonic 18650PF t
 
 - Raw data loading and SOC/Ah handling from `data/raw/panasonic_18650pf`
 - Feature scaling and sliding-window generation for time-series modeling
-- Multiple model types:
-  - `simple_mlp`
-  - `cnn`
-  - `indrnn`
-  - `neural_ode`
-  - CNN + UKF hybrid evaluation
+- Primary Neural ODE SOC model plus baseline comparators:
+  - `neural_ode` — primary research and deployment model
+  - `simple_mlp`, `cnn`, `indrnn` — baseline and comparison models
+  - CNN + UKF hybrid evaluation for the CNN baseline
 - Evaluation utilities for RMSE/MAE/MaxError and model comparison
 - API server scaffold with ONNX inference support
 
@@ -54,13 +52,25 @@ The project expects raw `.mat` and `.csv` files in that directory.
 Train a model with `train.py`:
 
 ```powershell
+python train.py --model neural_ode
 python train.py --model simple_mlp
 python train.py --model cnn
 python train.py --model indrnn
-python train.py --model neural_ode
 ```
 
+The Neural ODE model is the main project focus and the preferred model for export and inference. The other architectures are provided as baselines and for direct comparison.
+
 ## Evaluation
+
+### Benchmarking saved models
+
+Compare saved model checkpoints on the same held-out test split:
+
+```powershell
+python scripts/benchmark_models.py
+```
+
+This script evaluates `simple_mlp`, `cnn`, `indrnn`, and `neural_ode` if their checkpoint files exist.
 
 ### CNN + UKF evaluation
 
@@ -127,7 +137,7 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 - `src/models/` — model implementations
 - `src/evaluation/metrics.py` — evaluation helpers and plotting
 - `train.py` — model training entrypoint
-- `scripts/` — evaluation, export, and utility scripts
+- `scripts/` — evaluation, benchmark, export, and utility scripts
 - `api/main.py` — FastAPI REST API scaffold
 
 ## Notes

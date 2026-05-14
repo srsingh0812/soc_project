@@ -47,7 +47,7 @@ from src.utils.config import DataConfig, ModelConfig, Paths
 
 def export_model() -> None:
     model = NeuralODESOC()
-    state_dict = torch.load(Paths.BEST_MODEL_PT, map_location="cpu")
+    state_dict = torch.load(Paths.best_model_pt("neural_ode"), map_location="cpu")
     model.load_state_dict(state_dict)
     model.eval()
 
@@ -57,7 +57,7 @@ def export_model() -> None:
         torch.onnx.export(
             model,
             dummy,
-            Paths.ONNX_PATH,
+            Paths.onnx_path("neural_ode"),
             input_names=["battery_sequence"],
             output_names=["soc_prediction"],
             dynamic_axes={
@@ -76,7 +76,7 @@ def export_model() -> None:
         torch.onnx.export(
             model,
             dummy,
-            Paths.ONNX_PATH,
+            Paths.onnx_path("neural_ode"),
             input_names=["battery_sequence"],
             output_names=["soc_prediction"],
             dynamic_axes={
@@ -86,15 +86,16 @@ def export_model() -> None:
             opset_version=17,
         )
 
-    print(f"Saved ONNX model to {Paths.ONNX_PATH}")
+    onnx_path = Paths.onnx_path("neural_ode")
+    print(f"Saved ONNX model to {onnx_path}")
 
-    session = onnxruntime.InferenceSession(Paths.ONNX_PATH)
+    session = onnxruntime.InferenceSession(onnx_path)
     input_name = session.get_inputs()[0].name
     output_name = session.get_outputs()[0].name
     result = session.run([output_name], {input_name: dummy.numpy()})
     print(f"\n✅ ONNX export verified — model is ready for deployment")
     print(f"Output SOC value: {result[0]}")
-    print(f"Model saved at: {Paths.ONNX_PATH}")
+    print(f"Model saved at: {onnx_path}")
 
 
 if __name__ == "__main__":

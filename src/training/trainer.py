@@ -7,6 +7,7 @@ stopping and the main PyTorch training loop with MLflow logging.
 from __future__ import annotations
 
 import mlflow
+import os
 import torch
 import torch.nn as nn
 from torch.optim import Adam
@@ -114,8 +115,10 @@ class Trainer:
                 )
 
                 if val_loss <= min(self.history["val_loss"]):
-                    torch.save(self.model.state_dict(), Paths.BEST_MODEL_PT)
-                    mlflow.log_artifact(Paths.BEST_MODEL_PT)
+                    checkpoint_path = Paths.best_model_pt(run_name)
+                    os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+                    torch.save(self.model.state_dict(), checkpoint_path)
+                    mlflow.log_artifact(checkpoint_path)
 
                 if self.early_stopping.check(val_loss):
                     print("Early stopping triggered.")

@@ -23,6 +23,20 @@ class Paths:
     # File path for the exported ONNX model
     ONNX_PATH = os.path.join(MODELS_SAVED, "neural_ode.onnx")
 
+    # Template for per-model best checkpoint files, e.g. cnn_best.pt
+    BEST_MODEL_PT_TEMPLATE = os.path.join(MODELS_SAVED, "{}_best.pt")
+
+    # Template for per-model ONNX exports, e.g. neural_ode.onnx
+    ONNX_PATH_TEMPLATE = os.path.join(MODELS_SAVED, "{}.onnx")
+
+    @staticmethod
+    def best_model_pt(model_name: str) -> str:
+        return Paths.BEST_MODEL_PT_TEMPLATE.format(model_name)
+
+    @staticmethod
+    def onnx_path(model_name: str) -> str:
+        return Paths.ONNX_PATH_TEMPLATE.format(model_name)
+
 
 class DataConfig:
     # Number of timesteps used in each input window

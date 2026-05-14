@@ -93,23 +93,54 @@ What you should see:
 Common issue:
 - If `mlflow` is not found, install it with `python -m pip install mlflow`.
 
-## 7. Train the CNN model
+## 7. Train the Neural ODE model
 
 ```powershell
-python train.py --model cnn
+python train.py --model neural_ode
 ```
 
 What it does:
-- Trains the CNN baseline model using the available data.
+- Trains the main Neural ODE SOC model, which is the primary project focus.
 
 What you should see:
-- Epoch training and validation losses printed.
-- A model checkpoint saved to `models_saved/cnn_best.pt`.
+- Training progress and saved best checkpoint to `models_saved/neural_ode_best.pt`.
 
 Common issue:
-- If training fails due to missing data, verify `data/raw/panasonic_18650pf` contains the dataset.
+- If `torchdiffeq` is missing, install it with `python -m pip install torchdiffeq`.
 
-## 8. Run CNN+UKF evaluation
+## 8. Train baseline models (optional)
+
+```powershell
+python train.py --model simple_mlp
+python train.py --model cnn
+python train.py --model indrnn
+```
+
+What it does:
+- Trains the baseline comparison models that are used to benchmark against Neural ODE.
+
+What you should see:
+- Checkpoints saved to `models_saved/simple_mlp_best.pt`, `models_saved/cnn_best.pt`, and `models_saved/indrnn_best.pt`.
+
+Common issue:
+- These models are useful as baselines, but the Neural ODE path is the recommended deployment route.
+
+## 9. Benchmark all saved models
+
+```powershell
+python scripts/benchmark_models.py
+```
+
+What it does:
+- Loads saved checkpoints for available models and computes RMSE/MAE metrics on the same held-out test split.
+
+What you should see:
+- A comparison table showing which model performs best on the test set.
+
+Common issue:
+- Ensure the model checkpoint files exist before running this script.
+
+## 10. Run CNN+UKF evaluation (optional)
 
 ```powershell
 python .\scripts\evaluate_cnn_ukf.py
@@ -123,36 +154,6 @@ What you should see:
 
 Common issue:
 - If the checkpoint is not found, run CNN training first or provide `--model-path`.
-
-## 9. Train the IndRNN model
-
-```powershell
-python train.py --model indrnn
-```
-
-What it does:
-- Trains the IndRNN sequence model.
-
-What you should see:
-- Training progress and saved weights.
-
-Common issue:
-- Long runtime may require patience; monitor your system resources.
-
-## 10. Train the Neural ODE model
-
-```powershell
-python train.py --model neural_ode
-```
-
-What it does:
-- Trains the main Neural ODE SOC model.
-
-What you should see:
-- Training progress and saved best checkpoint.
-
-Common issue:
-- If `torchdiffeq` is missing, install it with `python -m pip install torchdiffeq`.
 
 ## 11. Export the trained model to ONNX
 
