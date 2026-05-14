@@ -73,7 +73,7 @@ class ODEFunc(nn.Module):
 
         # Interpolate between adjacent measurements.
         interpolated = inputs_lo + alpha * (inputs_hi - inputs_lo)
-        return interpolated
+        return interpolated.squeeze(1)
 
     def forward(self, t: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
         """Compute dh/dt given current state h and time t.

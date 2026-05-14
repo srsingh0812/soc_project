@@ -22,6 +22,10 @@ models_saved/*.pt
 models_saved/*.onnx
 models_saved/*.pkl
 
+# Local artifacts
+mlflow.db
+elm_output.txt
+
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
