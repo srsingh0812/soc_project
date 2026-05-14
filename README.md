@@ -1,82 +1,137 @@
-# Battery SOC Estimation Project
+﻿# Battery SOC Estimation Project
 
-This project estimates the state of charge (SOC) for electric vehicle (EV) batteries using a Neural Ordinary Differential Equation (Neural ODE) model. It includes data preparation, model training, and an API for inference.
+This repository estimates battery state-of-charge (SOC) from Panasonic 18650PF test data. It contains data ingestion, preprocessing, PyTorch model training, evaluation utilities, ONNX export, and a FastAPI inference scaffold.
 
-## What this project does
+## What this project includes
 
-- Loads battery data from Panasonic 18650PF tests
-- Processes the data into time-series windows
-- Trains machine learning models to predict SOC
-- Supports multiple model types, including:
+- Raw data loading and SOC/Ah handling from `data/raw/panasonic_18650pf`
+- Feature scaling and sliding-window generation for time-series modeling
+- Multiple model types:
   - `simple_mlp`
   - `cnn`
+  - `indrnn`
   - `neural_ode`
-- Serves a prediction API using FastAPI and Uvicorn
+  - CNN + UKF hybrid evaluation
+- Evaluation utilities for RMSE/MAE/MaxError and model comparison
+- API server scaffold with ONNX inference support
 
 ## Installation
 
 1. Clone the repository:
-
-```bash
+```powershell
 git clone <repository-url>
 cd soc_project
 ```
 
-2. Create a virtual environment:
-
-```bash
-py -3.11 -m venv battery_soc_env
+2. Create a Python 3.11 virtual environment:
+```powershell
+python -m venv battery_soc_env
 ```
 
 3. Activate the virtual environment:
-
 ```powershell
 .\battery_soc_env\Scripts\Activate.ps1
 ```
 
 4. Install dependencies:
-
-```bash
+```powershell
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements.txt
 ```
 
-## Dataset location
+## Data setup
 
-Place the Panasonic 18650PF dataset inside:
+Place the Panasonic 18650PF raw dataset under:
 
 ```text
 data/raw/panasonic_18650pf
 ```
 
-The code expects raw data files to be available under that folder.
+The project expects raw `.mat` and `.csv` files in that directory.
 
 ## Training
 
-Start training with one of the supported models:
+Train a model with `train.py`:
 
-```bash
+```powershell
 python train.py --model simple_mlp
 python train.py --model cnn
+python train.py --model indrnn
 python train.py --model neural_ode
 ```
 
-Use `simple_mlp` to begin, then experiment with `cnn` and `neural_ode`.
+## Evaluation
 
-## Start the API
+### CNN + UKF evaluation
 
-Run the API server locally with:
+Evaluate a trained CNN model and apply UKF correction with:
 
-```bash
-uvicorn api.main:app --reload --port 8000
+```powershell
+python scripts/evaluate_cnn_ukf.py
 ```
 
-Then open `http://localhost:8000` or use the API endpoints from a client.
+To use a custom checkpoint:
 
-## Results
+```powershell
+python scripts/evaluate_cnn_ukf.py --model-path models_saved/custom_cnn.pt
+```
 
-| Model        | RMSE @25C | RMSE @0C |
-|--------------|-----------|----------|
-| simple_mlp   | -         | -        |
-| cnn          | -         | -        |
-| neural_ode   | -         | -        |
+### Metric sanity check
+
+Run a simple metrics validation script:
+
+```powershell
+python scripts/test_metrics.py
+```
+
+## ONNX export and API
+
+Export a trained model to ONNX for inference:
+
+```powershell
+python scripts/export_to_onnx.py
+```
+
+Start the FastAPI server:
+
+1. Create a `.env` file containing:
+```text
+SOC_API_KEY=your_secret_api_key_here
+```
+
+2. Run:
+```powershell
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+3. Open the Swagger UI:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Example API request
+
+```bash
+curl -X POST "http://127.0.0.1:8000/predict" \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: your_secret_api_key_here" \
+  -d '{"readings": [{"voltage": 3.7, "current": 0.1, "temperature": 25.0}, ...]}'
+```
+
+## Project structure
+
+- `src/data/loader.py` — raw file loading, SOC/Ah conversion, data validation
+- `src/data/preprocessor.py` — normalization, window creation, scaler persistence
+- `src/data/dataset.py` — PyTorch dataset utilities
+- `src/models/` — model implementations
+- `src/evaluation/metrics.py` — evaluation helpers and plotting
+- `train.py` — model training entrypoint
+- `scripts/` — evaluation, export, and utility scripts
+- `api/main.py` — FastAPI REST API scaffold
+
+## Notes
+
+- The API requires a trained model and exported ONNX artifact before `/predict` will work.
+- `scripts/evaluate_cnn_ukf.py` uses a default checkpoint at `models_saved/cnn_best.pt` unless `--model-path` is supplied.
+- The training script uses split ratios roughly 70% train, 15% validation, and 15% test by filename.
